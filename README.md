@@ -4,7 +4,7 @@ This repository is prepared for a Magento 2 portfolio project using Magento Open
 
 ## Current Status
 
-Magento Open Source `2.4.8-p4` is installed through Docker with OpenSearch, RabbitMQ, Valkey, MySQL, MailHog, nginx, and PHP-FPM.
+Magento Open Source `2.4.8-p4` is installed through Docker with OpenSearch, RabbitMQ, Valkey, MySQL, MailHog, nginx, PHP-FPM, and a local mock ERP/PIM API.
 
 ## Prerequisites
 
@@ -58,6 +58,7 @@ http://magento.test:8080/
 - Queue: `rabbitmq:4.1-management`
 - Cache/session: `valkey/valkey:8-alpine`
 - Mail testing: `mailhog/mailhog`
+- Mock ERP/PIM API: `node:22-alpine`
 
 ## Useful Commands
 
@@ -68,14 +69,58 @@ make composer
 make reindex
 make clean-cache
 make logs
+make mock-erp-health
+make mock-erp-products
 ```
+
+## Mock ERP/PIM API
+
+The mock ERP/PIM API is available locally at:
+
+```text
+http://localhost:3001
+```
+
+Magento containers should call it through the internal Docker URL:
+
+```text
+http://mock-erp-api:3001
+```
+
+Protected endpoints require:
+
+```text
+Authorization: Bearer dev-erp-token
+```
+
+Useful endpoints:
+
+```text
+GET  /health
+GET  /docs
+GET  /openapi.json
+GET  /api/products/updates?page=1&pageSize=25
+GET  /api/products/{sku}
+GET  /api/inventory/{sku}
+POST /api/orders
+GET  /api/orders/{externalId}
+```
+
+The API supports pagination, bearer-token auth, idempotent order export, request IDs, artificial delay, and simulated `500`, `429`, and timeout responses. See [docs/mock-erp-api.md](docs/mock-erp-api.md).
+
+If port `3001` is already in use on your machine, change only the host port in `.env`:
+
+```env
+MOCK_ERP_API_HOST_PORT=3002
+```
+
+Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 ## Next Build Phases
 
 After Magento is installed:
 
-1. Add a mock ERP/PIM API service.
-2. Build `Portfolio_ErpSync`.
-3. Build `Portfolio_OrderExport`.
-4. Build `Portfolio_SearchEnhancer`.
-5. Add tests, CI, and architecture documentation.
+1. Build `Portfolio_ErpSync`.
+2. Build `Portfolio_OrderExport`.
+3. Build `Portfolio_SearchEnhancer`.
+4. Add tests, CI, and architecture documentation.

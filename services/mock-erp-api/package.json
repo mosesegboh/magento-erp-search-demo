@@ -1,0 +1,15 @@
+{
+  "name": "mock-erp-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local mock ERP/PIM API for Magento integration demos.",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
