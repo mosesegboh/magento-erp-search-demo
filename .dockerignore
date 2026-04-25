@@ -1,0 +1,12 @@
+.git
+.idea
+.env
+src/vendor
+src/generated
+src/pub/static
+src/pub/media
+src/var
+mysql
+opensearch
+redis
+rabbitmq

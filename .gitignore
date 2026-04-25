@@ -1,0 +1,15 @@
+.env
+.DS_Store
+.idea/
+src/app/etc/env.php
+src/app/etc/config.php
+src/auth.json
+src/generated/
+src/pub/static/
+src/pub/media/
+src/var/
+src/vendor/
+mysql/
+opensearch/
+redis/
+rabbitmq/
