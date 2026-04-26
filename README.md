@@ -73,6 +73,24 @@ make mock-erp-health
 make mock-erp-products
 ```
 
+## Magento Modules
+
+Current custom modules:
+
+```text
+Portfolio_ErpSync
+```
+
+Enable and run the ERP product sync module:
+
+```bash
+docker compose exec --user www-data php bin/magento module:enable Portfolio_ErpSync
+docker compose exec --user www-data php bin/magento setup:upgrade
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products --dry-run
+```
+
+See [docs/erp-sync-module.md](docs/erp-sync-module.md).
+
 ## Mock ERP/PIM API
 
 The mock ERP/PIM API is available locally at:
@@ -120,7 +138,6 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Build `Portfolio_ErpSync`.
-2. Build `Portfolio_OrderExport`.
-3. Build `Portfolio_SearchEnhancer`.
-4. Add tests, CI, and architecture documentation.
+1. Build `Portfolio_OrderExport`.
+2. Build `Portfolio_SearchEnhancer`.
+3. Add tests, CI, and architecture documentation.
