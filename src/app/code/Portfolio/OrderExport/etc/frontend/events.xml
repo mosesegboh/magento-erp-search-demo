@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_submit_all_after">
+        <observer name="portfolio_order_export_after_checkout" instance="Portfolio\OrderExport\Observer\ExportOrderAfterCheckout"/>
+    </event>
+</config>
