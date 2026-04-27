@@ -4,6 +4,9 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
+                <resource id="Portfolio_Core::integrations" title="Portfolio Integrations" sortOrder="80">
+                    <resource id="Portfolio_OrderExport::export_logs" title="Order Export Logs" sortOrder="20"/>
+                </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">

@@ -4,6 +4,9 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
+                <resource id="Portfolio_Core::integrations" title="Portfolio Integrations" sortOrder="80">
+                    <resource id="Portfolio_ErpSync::sync_logs" title="ERP Sync Logs" sortOrder="10"/>
+                </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">

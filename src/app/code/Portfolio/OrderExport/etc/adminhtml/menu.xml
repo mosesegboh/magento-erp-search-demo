@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Portfolio_OrderExport::export_logs"
+             title="Order Export Logs"
+             module="Portfolio_OrderExport"
+             sortOrder="20"
+             parent="Portfolio_Core::integrations"
+             action="portfolio_order/exportlog/index"
+             resource="Portfolio_OrderExport::export_logs"/>
+    </menu>
+</config>

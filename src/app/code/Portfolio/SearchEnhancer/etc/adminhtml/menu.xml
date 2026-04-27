@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Portfolio_SearchEnhancer::search_logs"
+             title="Search Query Logs"
+             module="Portfolio_SearchEnhancer"
+             sortOrder="30"
+             parent="Portfolio_Core::integrations"
+             action="portfolio_search/searchlog/index"
+             resource="Portfolio_SearchEnhancer::search_logs"/>
+    </menu>
+</config>

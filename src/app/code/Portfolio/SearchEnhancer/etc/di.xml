@@ -8,6 +8,20 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="portfolio_search_query_log_listing_data_source" xsi:type="string">Portfolio\SearchEnhancer\Model\ResourceModel\SearchQueryLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Portfolio\SearchEnhancer\Model\ResourceModel\SearchQueryLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">portfolio_search_query_log</argument>
+            <argument name="resourceModel" xsi:type="string">Portfolio\SearchEnhancer\Model\ResourceModel\SearchQueryLog</argument>
+        </arguments>
+    </virtualType>
     <type name="Portfolio\SearchEnhancer\Model\SuggestionService">
         <arguments>
             <argument name="searchCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
