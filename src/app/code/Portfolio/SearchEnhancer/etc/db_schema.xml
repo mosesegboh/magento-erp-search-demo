@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="portfolio_search_query_log" resource="default" engine="innodb" comment="Portfolio Search Query Log">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="varchar" name="query_text" nullable="false" length="255" comment="Query Text"/>
+        <column xsi:type="varchar" name="query_hash" nullable="false" length="64" comment="Query Hash"/>
+        <column xsi:type="int" name="result_count" unsigned="true" nullable="false" default="0" comment="Result Count"/>
+        <column xsi:type="varchar" name="source" nullable="false" length="32" default="suggest" comment="Source"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <index referenceId="PORTFOLIO_SEARCH_QUERY_LOG_QUERY_HASH" indexType="btree">
+            <column name="query_hash"/>
+        </index>
+        <index referenceId="PORTFOLIO_SEARCH_QUERY_LOG_RESULT_COUNT" indexType="btree">
+            <column name="result_count"/>
+        </index>
+        <index referenceId="PORTFOLIO_SEARCH_QUERY_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+    </table>
+</schema>

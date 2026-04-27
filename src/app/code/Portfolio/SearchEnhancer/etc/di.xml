@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="portfolio_search_opensearch_health" xsi:type="object">Portfolio\SearchEnhancer\Console\Command\OpenSearchHealthCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Portfolio\SearchEnhancer\Model\SuggestionService">
+        <arguments>
+            <argument name="searchCollectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+        </arguments>
+    </type>
+</config>

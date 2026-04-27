@@ -1,0 +1,22 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div
+    data-portfolio-search-root
+    data-endpoint="<?= $escaper->escapeUrl($block->getUrl('searchenhancer/suggest')) ?>"
+    data-search-url="<?= $escaper->escapeUrl($block->getUrl('catalogsearch/result')) ?>"
+    data-min-query-length="2"
+>
+    <noscript>
+        <form action="<?= $escaper->escapeUrl($block->getUrl('catalogsearch/result')) ?>" method="get">
+            <label for="portfolio-search-fallback"><?= $escaper->escapeHtml(__('Enhanced Product Search')) ?></label>
+            <input id="portfolio-search-fallback" type="search" name="q" />
+            <button type="submit"><?= $escaper->escapeHtml(__('Search')) ?></button>
+        </form>
+    </noscript>
+</div>
+<script
+    src="<?= $escaper->escapeUrl($block->getViewFileUrl('Portfolio_SearchEnhancer::js/search-autocomplete.bundle.js')) ?>"
+    defer
+></script>

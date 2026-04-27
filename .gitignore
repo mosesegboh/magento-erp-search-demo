@@ -9,6 +9,7 @@ src/pub/static/
 src/pub/media/
 src/var/
 src/vendor/
+src/app/code/Portfolio/SearchEnhancer/frontend/node_modules/
 mysql/
 opensearch/
 redis/

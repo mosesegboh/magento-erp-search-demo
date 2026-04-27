@@ -80,6 +80,7 @@ Current custom modules:
 ```text
 Portfolio_ErpSync
 Portfolio_OrderExport
+Portfolio_SearchEnhancer
 ```
 
 Enable and run the ERP product sync module:
@@ -101,6 +102,19 @@ docker compose exec --user www-data php bin/magento portfolio:order-export:expor
 ```
 
 See [docs/order-export-module.md](docs/order-export-module.md).
+
+Enable and test the search enhancer module:
+
+```bash
+docker compose exec --user www-data php bin/magento module:enable Portfolio_SearchEnhancer
+docker compose exec --user www-data php bin/magento setup:upgrade
+make search-widget-install
+make search-widget-build
+docker compose exec --user www-data php bin/magento portfolio:search:opensearch-health
+curl -i "http://localhost:8080/searchenhancer/suggest?q=backpack"
+```
+
+See [docs/search-enhancer-module.md](docs/search-enhancer-module.md).
 
 ## Mock ERP/PIM API
 
@@ -149,6 +163,6 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Build `Portfolio_SearchEnhancer`.
-2. Add RabbitMQ consumers for async ERP product sync and order export.
+1. Add RabbitMQ consumers for async ERP product sync and order export.
+2. Add admin grids for sync/export/search logs.
 3. Add tests, CI, and architecture documentation.
