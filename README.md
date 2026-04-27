@@ -79,6 +79,7 @@ Current custom modules:
 
 ```text
 Portfolio_ErpSync
+Portfolio_OrderExport
 ```
 
 Enable and run the ERP product sync module:
@@ -90,6 +91,16 @@ docker compose exec --user www-data php bin/magento portfolio:erp:sync-products 
 ```
 
 See [docs/erp-sync-module.md](docs/erp-sync-module.md).
+
+Enable and test the order export module:
+
+```bash
+docker compose exec --user www-data php bin/magento module:enable Portfolio_OrderExport
+docker compose exec --user www-data php bin/magento setup:upgrade
+docker compose exec --user www-data php bin/magento portfolio:order-export:export 100000001
+```
+
+See [docs/order-export-module.md](docs/order-export-module.md).
 
 ## Mock ERP/PIM API
 
@@ -138,6 +149,6 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Build `Portfolio_OrderExport`.
-2. Build `Portfolio_SearchEnhancer`.
+1. Build `Portfolio_SearchEnhancer`.
+2. Add RabbitMQ consumers for async ERP product sync and order export.
 3. Add tests, CI, and architecture documentation.
