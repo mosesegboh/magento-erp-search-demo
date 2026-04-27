@@ -9,4 +9,18 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="portfolio_erp_sync_log_listing_data_source" xsi:type="string">Portfolio\ErpSync\Model\ResourceModel\SyncLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Portfolio\ErpSync\Model\ResourceModel\SyncLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">portfolio_erp_sync_log</argument>
+            <argument name="resourceModel" xsi:type="string">Portfolio\ErpSync\Model\ResourceModel\SyncLog</argument>
+        </arguments>
+    </virtualType>
 </config>

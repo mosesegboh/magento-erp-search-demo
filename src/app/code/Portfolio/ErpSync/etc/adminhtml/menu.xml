@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Portfolio_Core::integrations"
+             title="Portfolio"
+             module="Portfolio_ErpSync"
+             sortOrder="80"
+             resource="Portfolio_Core::integrations"/>
+        <add id="Portfolio_ErpSync::sync_logs"
+             title="ERP Sync Logs"
+             module="Portfolio_ErpSync"
+             sortOrder="10"
+             parent="Portfolio_Core::integrations"
+             action="portfolio_erp/synclog/index"
+             resource="Portfolio_ErpSync::sync_logs"/>
+    </menu>
+</config>

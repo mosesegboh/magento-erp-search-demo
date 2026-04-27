@@ -9,4 +9,18 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="portfolio_order_export_log_listing_data_source" xsi:type="string">Portfolio\OrderExport\Model\ResourceModel\ExportLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Portfolio\OrderExport\Model\ResourceModel\ExportLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">portfolio_order_export_log</argument>
+            <argument name="resourceModel" xsi:type="string">Portfolio\OrderExport\Model\ResourceModel\ExportLog</argument>
+        </arguments>
+    </virtualType>
 </config>
