@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: init up down build install shell magento composer logs ps clean-cache reindex cron mock-erp-health mock-erp-products mock-erp-logs
+.PHONY: init up down build install shell magento composer logs ps clean-cache reindex cron mock-erp-health mock-erp-products mock-erp-logs search-widget-install search-widget-build
 
 init:
 	cp -n .env.example .env
@@ -53,3 +53,9 @@ mock-erp-health:
 
 mock-erp-products:
 	curl -fsS -H "Authorization: Bearer $(MOCK_ERP_API_TOKEN)" "http://localhost:$(MOCK_ERP_API_HOST_PORT)/api/products/updates?page=1&pageSize=5"
+
+search-widget-install:
+	cd src/app/code/Portfolio/SearchEnhancer/frontend && npm install
+
+search-widget-build:
+	cd src/app/code/Portfolio/SearchEnhancer/frontend && npm run build

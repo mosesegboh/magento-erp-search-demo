@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <portfolio_search_enhancer>
+            <general>
+                <enabled>1</enabled>
+                <min_query_length>2</min_query_length>
+                <max_query_length>80</max_query_length>
+                <suggestion_limit>6</suggestion_limit>
+                <cache_ttl>60</cache_ttl>
+                <log_zero_results>1</log_zero_results>
+            </general>
+        </portfolio_search_enhancer>
+    </default>
+</config>
