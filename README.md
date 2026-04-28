@@ -6,6 +6,11 @@ This repository is prepared for a Magento 2 portfolio project using Magento Open
 
 Magento Open Source `2.4.8-p4` is installed through Docker with OpenSearch, RabbitMQ, Valkey, MySQL, MailHog, nginx, PHP-FPM, and a local mock ERP/PIM API.
 
+## Project Walkthrough
+
+- [Architecture overview](docs/architecture.md)
+- [Reviewer checklist](docs/reviewer-checklist.md)
+
 ## Prerequisites
 
 - Docker Engine
@@ -195,5 +200,5 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Add architecture diagrams and final presentation notes.
-2. Add optional AI-assisted catalog enrichment notes.
+1. Add automated PHPUnit integration tests.
+2. Add production deployment notes.
