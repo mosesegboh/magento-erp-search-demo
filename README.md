@@ -138,6 +138,12 @@ Portfolio > Search Query Logs
 
 See [docs/admin-integration-grids.md](docs/admin-integration-grids.md).
 
+## CI Quality Checks
+
+This repository includes GitHub Actions checks for custom PHP syntax, Magento XML configuration, mock ERP API JavaScript syntax, React widget build output, and Docker Compose configuration.
+
+See [docs/ci-quality-checks.md](docs/ci-quality-checks.md).
+
 ## Mock ERP/PIM API
 
 The mock ERP/PIM API is available locally at:
@@ -185,5 +191,5 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Add tests, CI, and architecture documentation.
-2. Add retry/backoff policies and dead-letter queue documentation.
+1. Add retry/backoff policies and dead-letter queue documentation.
+2. Add architecture diagrams and final presentation notes.
