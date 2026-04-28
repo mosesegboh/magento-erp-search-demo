@@ -27,12 +27,7 @@ class ProductSyncPublisher
         $log = $this->productSyncService->queueSync($since, $pageSize, $dryRun);
 
         try {
-            $this->publisher->publish(self::TOPIC_NAME, [
-                'since' => $since ?? '',
-                'pageSize' => $pageSize ?? 0,
-                'dryRun' => $dryRun,
-                'logId' => (int)$log->getId(),
-            ]);
+            $this->publishMessage($since, $pageSize, $dryRun, (int)$log->getId(), 1);
         } catch (\Throwable $exception) {
             $log->setData('status', SyncLog::STATUS_FAILED);
             $log->setData('message', sprintf('Queue publish failed: %s', $exception->getMessage()));
@@ -48,5 +43,21 @@ class ProductSyncPublisher
         }
 
         return (int)$log->getId();
+    }
+
+    public function publishRetry(SyncLog $log, ?string $since, ?int $pageSize, bool $dryRun, int $attempt): void
+    {
+        $this->publishMessage($since, $pageSize, $dryRun, (int)$log->getId(), max($attempt, 1));
+    }
+
+    private function publishMessage(?string $since, ?int $pageSize, bool $dryRun, int $logId, int $attempt): void
+    {
+        $this->publisher->publish(self::TOPIC_NAME, [
+            'since' => $since ?? '',
+            'pageSize' => $pageSize ?? 0,
+            'dryRun' => $dryRun,
+            'logId' => $logId,
+            'attempt' => $attempt,
+        ]);
     }
 }

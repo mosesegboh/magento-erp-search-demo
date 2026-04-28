@@ -15,6 +15,8 @@ class Config
     private const XML_PATH_API_BASE_URL = 'portfolio_order_export/api/base_url';
     private const XML_PATH_API_TOKEN = 'portfolio_order_export/api/token';
     private const XML_PATH_API_TIMEOUT = 'portfolio_order_export/api/timeout';
+    private const XML_PATH_RETRY_MAX_ATTEMPTS = 'portfolio_order_export/retry/max_attempts';
+    private const XML_PATH_RETRY_BASE_DELAY_SECONDS = 'portfolio_order_export/retry/base_delay_seconds';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
@@ -61,5 +63,25 @@ class Config
     {
         $timeout = (int)$this->scopeConfig->getValue(self::XML_PATH_API_TIMEOUT, ScopeInterface::SCOPE_STORE);
         return max($timeout, 1);
+    }
+
+    public function getMaxRetryAttempts(): int
+    {
+        $attempts = (int)$this->scopeConfig->getValue(
+            self::XML_PATH_RETRY_MAX_ATTEMPTS,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        return min(max($attempts, 1), 10);
+    }
+
+    public function getRetryBaseDelaySeconds(): int
+    {
+        $delay = (int)$this->scopeConfig->getValue(
+            self::XML_PATH_RETRY_BASE_DELAY_SECONDS,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        return min(max($delay, 0), 3600);
     }
 }

@@ -62,6 +62,12 @@
                 <label translate="true">Status</label>
             </settings>
         </column>
+        <column name="attempts">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Attempts</label>
+            </settings>
+        </column>
         <column name="items_processed">
             <settings>
                 <filter>textRange</filter>
@@ -79,6 +85,13 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Started At</label>
+            </settings>
+        </column>
+        <column name="next_retry_at" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Next Retry At</label>
             </settings>
         </column>
         <column name="finished_at" class="Magento\Ui\Component\Listing\Columns\Date">

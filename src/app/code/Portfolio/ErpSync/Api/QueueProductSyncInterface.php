@@ -13,7 +13,14 @@ interface QueueProductSyncInterface
      * @param int $pageSize Optional ERP API page-size override.
      * @param bool $dryRun Whether to fetch and log products without writing catalog changes.
      * @param int $logId Existing sync log ID created when the message was published.
+     * @param int $attempt Current queue attempt number.
      * @return void
      */
-    public function execute(string $since = '', int $pageSize = 0, bool $dryRun = false, int $logId = 0): void;
+    public function execute(
+        string $since = '',
+        int $pageSize = 0,
+        bool $dryRun = false,
+        int $logId = 0,
+        int $attempt = 1
+    ): void;
 }

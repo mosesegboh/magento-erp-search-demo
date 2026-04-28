@@ -56,7 +56,7 @@ Consume one message:
 docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.erp.product_sync --max-messages=1
 ```
 
-The ERP sync admin grid should move the log from `queued` to `success` or `failed`:
+The ERP sync admin grid should move the log from `queued` to `success`, `retry_scheduled`, or `dead_lettered`:
 
 ```text
 Portfolio > ERP Sync Logs
@@ -76,7 +76,7 @@ Consume one message:
 docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.order.export --max-messages=1
 ```
 
-The order export admin grid should move the log from `queued` to `success` or `failed`:
+The order export admin grid should move the log from `queued` to `success`, `retry_scheduled`, or `dead_lettered`:
 
 ```text
 Portfolio > Order Export Logs
@@ -108,11 +108,25 @@ Default local credentials:
 magento / magento
 ```
 
+## Retry And Dead Letter Handling
+
+Failed ERP sync and order export messages are not thrown forever. The consumers update the integration logs with retry state, exponential backoff, and dead-letter status after the configured max attempts.
+
+Useful retry commands:
+
+```bash
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:retry-due
+docker compose exec --user www-data php bin/magento portfolio:order-export:retry-due
+```
+
+See [retry-backoff-dlq.md](retry-backoff-dlq.md).
+
 ## Senior-Level Talking Points
 
 - Checkout and scheduled sync flows no longer block on external ERP latency.
 - Queue messages are typed through Magento `communication.xml` service method schemas.
 - Publishers create operational log rows before publishing, so queued work is visible in admin.
-- Consumers set the Magento area code, call the existing domain services, and rethrow failures so queue processing marks failed messages correctly.
+- Consumers set the Magento area code, call the existing domain services, and schedule retries instead of blocking workers with external-system failures.
+- Failed work has explicit `retry_scheduled` and `dead_lettered` states, making operational recovery visible from Magento admin.
 - The original synchronous CLI commands remain available for support, debugging, and forced retries.
 - RabbitMQ is already part of the Docker stack, matching the production integration architecture.

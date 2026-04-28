@@ -5,5 +5,8 @@
         <job name="portfolio_erp_sync_products" instance="Portfolio\ErpSync\Cron\SyncProducts" method="execute">
             <schedule>*/15 * * * *</schedule>
         </job>
+        <job name="portfolio_erp_sync_retry_due" instance="Portfolio\ErpSync\Cron\RetryDueSyncProducts" method="execute">
+            <schedule>*/5 * * * *</schedule>
+        </job>
     </group>
 </config>

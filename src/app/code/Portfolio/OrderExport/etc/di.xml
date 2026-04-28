@@ -7,6 +7,7 @@
             <argument name="commands" xsi:type="array">
                 <item name="portfolio_order_export" xsi:type="object">Portfolio\OrderExport\Console\Command\ExportOrderCommand</item>
                 <item name="portfolio_order_export_enqueue" xsi:type="object">Portfolio\OrderExport\Console\Command\QueueExportOrderCommand</item>
+                <item name="portfolio_order_export_retry_due" xsi:type="object">Portfolio\OrderExport\Console\Command\RetryDueOrderExportsCommand</item>
             </argument>
         </arguments>
     </type>

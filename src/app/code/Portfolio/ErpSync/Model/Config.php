@@ -16,6 +16,8 @@ class Config
     private const XML_PATH_API_TOKEN = 'portfolio_erp_sync/api/token';
     private const XML_PATH_API_TIMEOUT = 'portfolio_erp_sync/api/timeout';
     private const XML_PATH_API_PAGE_SIZE = 'portfolio_erp_sync/api/page_size';
+    private const XML_PATH_RETRY_MAX_ATTEMPTS = 'portfolio_erp_sync/retry/max_attempts';
+    private const XML_PATH_RETRY_BASE_DELAY_SECONDS = 'portfolio_erp_sync/retry/base_delay_seconds';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
@@ -68,5 +70,25 @@ class Config
     {
         $pageSize = (int)$this->scopeConfig->getValue(self::XML_PATH_API_PAGE_SIZE, ScopeInterface::SCOPE_STORE);
         return min(max($pageSize, 1), 100);
+    }
+
+    public function getMaxRetryAttempts(): int
+    {
+        $attempts = (int)$this->scopeConfig->getValue(
+            self::XML_PATH_RETRY_MAX_ATTEMPTS,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        return min(max($attempts, 1), 10);
+    }
+
+    public function getRetryBaseDelaySeconds(): int
+    {
+        $delay = (int)$this->scopeConfig->getValue(
+            self::XML_PATH_RETRY_BASE_DELAY_SECONDS,
+            ScopeInterface::SCOPE_STORE
+        );
+
+        return min(max($delay, 0), 3600);
     }
 }

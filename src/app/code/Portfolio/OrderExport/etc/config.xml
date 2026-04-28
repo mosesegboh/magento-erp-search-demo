@@ -12,6 +12,10 @@
                 <token>dev-erp-token</token>
                 <timeout>15</timeout>
             </api>
+            <retry>
+                <max_attempts>3</max_attempts>
+                <base_delay_seconds>60</base_delay_seconds>
+            </retry>
         </portfolio_order_export>
     </default>
 </config>

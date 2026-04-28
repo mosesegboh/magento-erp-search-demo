@@ -43,6 +43,7 @@ class OrderExportService
         $log->setData('attempts', $attempts);
         $log->setData('request_payload', json_encode($payload, JSON_THROW_ON_ERROR));
         $log->setData('status', ExportLog::STATUS_PENDING);
+        $log->setData('next_retry_at', null);
         $this->exportLogResource->save($log);
 
         try {
@@ -53,9 +54,11 @@ class OrderExportService
             $log->setData('external_id', $externalId !== '' ? $externalId : null);
             $log->setData('response_payload', json_encode($response, JSON_THROW_ON_ERROR));
             $log->setData('message', 'Order exported successfully.');
+            $log->setData('next_retry_at', null);
         } catch (\Throwable $exception) {
             $log->setData('status', ExportLog::STATUS_FAILED);
             $log->setData('message', $exception->getMessage());
+            $log->setData('next_retry_at', null);
             $this->exportLogResource->save($log);
             throw $exception;
         }
@@ -80,6 +83,13 @@ class OrderExportService
 
         $log->setData('status', ExportLog::STATUS_QUEUED);
         $log->setData('message', 'Order export queued for asynchronous processing.');
+        $log->setData('context', json_encode([
+            'order_id' => $orderId,
+            'force' => $force,
+            'queue_topic' => 'portfolio.order.export',
+            'next_attempt' => max((int)$log->getData('attempts') + 1, 1),
+        ], JSON_THROW_ON_ERROR));
+        $log->setData('next_retry_at', null);
         $this->exportLogResource->save($log);
 
         return $log;

@@ -11,7 +11,9 @@
         <column xsi:type="int" name="attempts" unsigned="true" nullable="false" default="0" comment="Attempt Count"/>
         <column xsi:type="text" name="request_payload" nullable="true" comment="Request Payload JSON"/>
         <column xsi:type="text" name="response_payload" nullable="true" comment="Response Payload JSON"/>
+        <column xsi:type="text" name="context" nullable="true" comment="Context JSON"/>
         <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="timestamp" name="next_retry_at" nullable="true" comment="Next Retry At"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
@@ -28,6 +30,10 @@
         </index>
         <index referenceId="PORTFOLIO_ORDER_EXPORT_LOG_INCREMENT_ID" indexType="btree">
             <column name="increment_id"/>
+        </index>
+        <index referenceId="PORTFOLIO_ORDER_EXPORT_LOG_STATUS_NEXT_RETRY_AT" indexType="btree">
+            <column name="status"/>
+            <column name="next_retry_at"/>
         </index>
     </table>
 </schema>
