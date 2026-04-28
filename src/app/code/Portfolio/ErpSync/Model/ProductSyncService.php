@@ -16,10 +16,24 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Portfolio\ErpSync\Api\ErpClientInterface;
+use Portfolio\ErpSync\Model\Dto\ErpProductData;
 use Portfolio\ErpSync\Model\ResourceModel\SyncLog as SyncLogResource;
 
 class ProductSyncService
 {
+    private const STATUS_MAP = [
+        'enabled' => Status::STATUS_ENABLED,
+        'disabled' => Status::STATUS_DISABLED,
+    ];
+
+    private const VISIBILITY_MAP = [
+        'catalog' => Visibility::VISIBILITY_IN_CATALOG,
+        'search' => Visibility::VISIBILITY_IN_SEARCH,
+        'not_visible' => Visibility::VISIBILITY_NOT_VISIBLE,
+        'hidden' => Visibility::VISIBILITY_NOT_VISIBLE,
+        'catalog_search' => Visibility::VISIBILITY_BOTH,
+    ];
+
     public function __construct(
         private readonly Config $config,
         private readonly ErpClientInterface $erpClient,
@@ -70,7 +84,7 @@ class ProductSyncService
                         continue;
                     }
 
-                    $this->upsertProduct($item, $dryRun);
+                    $this->upsertProduct(ErpProductData::fromPayload($item), $dryRun);
                     $itemsProcessed++;
                 }
 
@@ -133,7 +147,7 @@ class ProductSyncService
                 'next_attempt' => 1,
             ], JSON_THROW_ON_ERROR),
             'next_retry_at' => null,
-            'started_at' => gmdate('Y-m-d H:i:s'),
+            'started_at' => $this->getCurrentUtcTimestamp(),
         ]);
         $this->syncLogResource->save($log);
 
@@ -141,72 +155,58 @@ class ProductSyncService
     }
 
     /**
-     * @param array<string, mixed> $payload
      * @throws LocalizedException
      */
-    private function upsertProduct(array $payload, bool $dryRun): void
+    private function upsertProduct(ErpProductData $productData, bool $dryRun): void
     {
-        $sku = trim((string)($payload['sku'] ?? ''));
-
-        if ($sku === '') {
-            throw new LocalizedException(__('ERP product payload is missing sku.'));
-        }
-
         if ($dryRun) {
             return;
         }
 
+        $productSku = $productData->getProductSku();
+
         try {
-            $product = $this->productRepository->get($sku, false, null, true);
+            $product = $this->productRepository->get($productSku, false, null, true);
         } catch (NoSuchEntityException) {
             $product = $this->productFactory->create();
-            $product->setSku($sku);
+            $product->setSku($productSku);
             $product->setTypeId(Type::TYPE_SIMPLE);
             $product->setAttributeSetId($this->getDefaultAttributeSetId());
         }
 
-        $name = (string)($payload['name'] ?? $sku);
-        $stockQty = (float)($payload['stockQty'] ?? 0);
-        $isInStock = (bool)($payload['isInStock'] ?? $stockQty > 0);
-
-        $product->setName($name);
-        $product->setPrice((float)($payload['price'] ?? 0));
-        $product->setStatus($this->mapStatus((string)($payload['status'] ?? 'enabled')));
-        $product->setVisibility($this->mapVisibility((string)($payload['visibility'] ?? 'catalog_search')));
+        $product->setName($productData->getName());
+        $product->setPrice($productData->getPrice());
+        $product->setStatus($this->mapStatus($productData->getStatus()));
+        $product->setVisibility($this->mapVisibility($productData->getVisibility()));
         $product->setWebsiteIds([$this->storeManager->getDefaultStoreView()->getWebsiteId()]);
         $product->setTaxClassId(0);
         $product->setWeight(1);
-        $product->setUrlKey($this->buildUrlKey($name, $sku));
-        $product->setDescription($this->buildDescription($payload));
-        $product->setCustomAttribute('erp_brand', (string)($payload['brand'] ?? ''));
-        $product->setCustomAttribute('erp_source_updated_at', (string)($payload['updatedAt'] ?? ''));
+        $product->setUrlKey($this->buildUrlKey($productData->getName(), $productSku));
+        $product->setDescription($this->buildDescription($productData));
+        $product->setCustomAttribute('erp_brand', $productData->getBrand());
+        $product->setCustomAttribute('erp_source_updated_at', $productData->getSourceUpdatedAt());
 
         $this->productRepository->save($product);
-        $this->updateStock($sku, $stockQty, $isInStock);
+        $this->updateStock($productSku, $productData->getStockQuantity(), $productData->isInStock());
     }
 
-    private function updateStock(string $sku, float $stockQty, bool $isInStock): void
+    private function updateStock(string $productSku, float $stockQuantity, bool $isInStock): void
     {
-        $stockItem = $this->stockRegistry->getStockItemBySku($sku);
-        $stockItem->setQty($stockQty);
+        $stockItem = $this->stockRegistry->getStockItemBySku($productSku);
+        $stockItem->setQty($stockQuantity);
         $stockItem->setIsInStock($isInStock);
         $stockItem->setManageStock(true);
-        $this->stockRegistry->updateStockItemBySku($sku, $stockItem);
+        $this->stockRegistry->updateStockItemBySku($productSku, $stockItem);
     }
 
     private function mapStatus(string $status): int
     {
-        return strtolower($status) === 'enabled' ? Status::STATUS_ENABLED : Status::STATUS_DISABLED;
+        return self::STATUS_MAP[strtolower($status)] ?? Status::STATUS_DISABLED;
     }
 
     private function mapVisibility(string $visibility): int
     {
-        return match (strtolower($visibility)) {
-            'catalog' => Visibility::VISIBILITY_IN_CATALOG,
-            'search' => Visibility::VISIBILITY_IN_SEARCH,
-            'not_visible', 'hidden' => Visibility::VISIBILITY_NOT_VISIBLE,
-            default => Visibility::VISIBILITY_BOTH,
-        };
+        return self::VISIBILITY_MAP[strtolower($visibility)] ?? Visibility::VISIBILITY_BOTH;
     }
 
     private function getDefaultAttributeSetId(): int
@@ -214,33 +214,18 @@ class ProductSyncService
         return (int)$this->eavConfig->getEntityType(Product::ENTITY)->getDefaultAttributeSetId();
     }
 
-    private function buildUrlKey(string $name, string $sku): string
+    private function buildUrlKey(string $name, string $productSku): string
     {
-        $urlKey = strtolower((string)preg_replace('/[^a-zA-Z0-9]+/', '-', $name . '-' . $sku));
+        $urlKey = strtolower((string)preg_replace('/[^a-zA-Z0-9]+/', '-', $name . '-' . $productSku));
         return trim($urlKey, '-');
     }
 
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function buildDescription(array $payload): string
+    private function buildDescription(ErpProductData $productData): string
     {
-        $categories = $payload['categories'] ?? [];
-
-        if (!is_array($categories)) {
-            $categories = [];
-        }
-
-        $tags = $payload['attributes']['tags'] ?? [];
-
-        if (!is_array($tags)) {
-            $tags = [];
-        }
-
         return sprintf(
             'Imported from ERP. Categories: %s. Tags: %s.',
-            implode(', ', $categories),
-            implode(', ', $tags)
+            implode(', ', $productData->getCategories()),
+            implode(', ', $productData->getTags())
         );
     }
 
@@ -265,7 +250,7 @@ class ProductSyncService
                 'attempt' => $attempt,
             ], JSON_THROW_ON_ERROR),
             'next_retry_at' => null,
-            'started_at' => gmdate('Y-m-d H:i:s'),
+            'started_at' => $this->getCurrentUtcTimestamp(),
         ];
 
         if ($log->getId()) {
@@ -288,7 +273,12 @@ class ProductSyncService
         $log->setData('message', $message);
         $log->setData('context', json_encode($context, JSON_THROW_ON_ERROR));
         $log->setData('next_retry_at', null);
-        $log->setData('finished_at', gmdate('Y-m-d H:i:s'));
+        $log->setData('finished_at', $this->getCurrentUtcTimestamp());
         $this->syncLogResource->save($log);
+    }
+
+    private function getCurrentUtcTimestamp(): string
+    {
+        return (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
     }
 }

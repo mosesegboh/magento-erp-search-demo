@@ -10,6 +10,7 @@ use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Portfolio\OrderExport\Model\OrderReferenceResolver;
 use Portfolio\OrderExport\Model\Queue\OrderExportPublisher;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,12 +25,14 @@ class QueueExportOrderCommand extends Command
 
     public function __construct(
         private readonly OrderExportPublisher $orderExportPublisher,
-        private readonly OrderRepositoryInterface $orderRepository,
-        private readonly OrderCollectionFactory $orderCollectionFactory,
+        OrderRepositoryInterface $orderRepository,
+        OrderCollectionFactory $orderCollectionFactory,
         ?string $name = null,
-        private ?State $appState = null
+        private ?State $appState = null,
+        private ?OrderReferenceResolver $orderReferenceResolver = null
     ) {
         $this->appState ??= ObjectManager::getInstance()->get(State::class);
+        $this->orderReferenceResolver ??= ObjectManager::getInstance()->get(OrderReferenceResolver::class);
         parent::__construct($name);
     }
 
@@ -48,7 +51,7 @@ class QueueExportOrderCommand extends Command
         $this->setAreaCode();
 
         try {
-            $orderId = $this->resolveOrderId((string)$input->getArgument(self::ARGUMENT_ORDER));
+            $orderId = $this->orderReferenceResolver->resolve((string)$input->getArgument(self::ARGUMENT_ORDER));
             $logId = $this->orderExportPublisher->publish($orderId, (bool)$input->getOption(self::OPTION_FORCE));
         } catch (\Throwable $exception) {
             $output->writeln(sprintf('<error>Order export enqueue failed: %s</error>', $exception->getMessage()));
@@ -58,29 +61,6 @@ class QueueExportOrderCommand extends Command
         $output->writeln(sprintf('<info>Order export queued. Log ID: %d.</info>', $logId));
 
         return Command::SUCCESS;
-    }
-
-    private function resolveOrderId(string $orderReference): int
-    {
-        if (ctype_digit($orderReference)) {
-            try {
-                $order = $this->orderRepository->get((int)$orderReference);
-                return (int)$order->getEntityId();
-            } catch (\Throwable) {
-                // Fall back to increment ID lookup below.
-            }
-        }
-
-        $collection = $this->orderCollectionFactory->create();
-        $collection->addFieldToFilter('increment_id', $orderReference);
-        $collection->setPageSize(1);
-        $order = $collection->getFirstItem();
-
-        if (!$order->getId()) {
-            throw new LocalizedException(__('Order %1 was not found.', $orderReference));
-        }
-
-        return (int)$order->getId();
     }
 
     private function setAreaCode(): void
