@@ -31,7 +31,7 @@ class ProductSyncPublisher
         } catch (\Throwable $exception) {
             $log->setData('status', SyncLog::STATUS_FAILED);
             $log->setData('message', sprintf('Queue publish failed: %s', $exception->getMessage()));
-            $log->setData('finished_at', gmdate('Y-m-d H:i:s'));
+            $log->setData('finished_at', $this->getCurrentUtcTimestamp());
             $this->syncLogResource->save($log);
 
             $this->logger->critical('ERP product sync queue publish failed.', [
@@ -59,5 +59,10 @@ class ProductSyncPublisher
             'logId' => $logId,
             'attempt' => $attempt,
         ]);
+    }
+
+    private function getCurrentUtcTimestamp(): string
+    {
+        return (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
     }
 }

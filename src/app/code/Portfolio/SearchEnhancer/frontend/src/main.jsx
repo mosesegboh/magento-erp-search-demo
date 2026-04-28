@@ -23,26 +23,47 @@ function SearchAutocomplete({ endpoint, searchUrl, minQueryLength = DEFAULTS.min
 
   useEffect(() => {
     const normalizedQuery = deferredQuery.replace(/\s+/g, ' ');
+    const requestSequence = cancelInFlightRequest();
 
     if (normalizedQuery.length < minQueryLength) {
-      abortRef.current?.abort();
       setState({ status: 'idle', items: [], message: '' });
       setActiveIndex(-1);
       return;
     }
 
+    setState({ status: 'idle', items: [], message: '' });
+    setActiveIndex(-1);
+
     const debounceTimer = window.setTimeout(() => {
-      fetchSuggestions(normalizedQuery);
+      fetchSuggestions(normalizedQuery, requestSequence);
     }, DEFAULTS.debounceMs);
 
     return () => window.clearTimeout(debounceTimer);
   }, [deferredQuery, endpoint, minQueryLength]);
 
-  async function fetchSuggestions(searchTerm) {
+  useEffect(() => () => {
+    cancelInFlightRequest();
+  }, []);
+
+  function cancelInFlightRequest() {
+    abortRef.current?.abort();
+    abortRef.current = null;
+    return ++sequenceRef.current;
+  }
+
+  async function fetchSuggestions(searchTerm, requestSequence) {
+    if (requestSequence !== sequenceRef.current) {
+      return;
+    }
+
     const cacheKey = searchTerm.toLowerCase();
     const cached = getCached(cacheKey);
 
     if (cached) {
+      if (requestSequence !== sequenceRef.current) {
+        return;
+      }
+
       startTransition(() => {
         setState({ status: 'success', items: cached.items, message: cached.items.length ? '' : 'No matching products found.' });
         setActiveIndex(cached.items.length ? 0 : -1);
@@ -50,10 +71,8 @@ function SearchAutocomplete({ endpoint, searchUrl, minQueryLength = DEFAULTS.min
       return;
     }
 
-    abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    const requestSequence = ++sequenceRef.current;
     const timeoutId = window.setTimeout(() => controller.abort(), DEFAULTS.requestTimeoutMs);
 
     setState((current) => ({ ...current, status: 'loading', message: '' }));
@@ -106,6 +125,10 @@ function SearchAutocomplete({ endpoint, searchUrl, minQueryLength = DEFAULTS.min
       setActiveIndex(-1);
     } finally {
       window.clearTimeout(timeoutId);
+
+      if (abortRef.current === controller) {
+        abortRef.current = null;
+      }
     }
   }
 
@@ -156,6 +179,7 @@ function SearchAutocomplete({ endpoint, searchUrl, minQueryLength = DEFAULTS.min
     }
 
     if (event.key === 'Escape') {
+      cancelInFlightRequest();
       setState({ status: 'idle', items: [], message: '' });
       setActiveIndex(-1);
     }

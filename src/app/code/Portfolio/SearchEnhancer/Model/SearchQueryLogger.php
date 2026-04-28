@@ -21,11 +21,7 @@ class SearchQueryLogger
 
     public function log(string $query, int $resultCount, string $source = 'suggest'): void
     {
-        if ($resultCount > 0 && $this->config->shouldLogZeroResults()) {
-            return;
-        }
-
-        if (!$this->config->shouldLogZeroResults() && $resultCount === 0) {
+        if (!$this->config->shouldLogZeroResults() || $resultCount > 0) {
             return;
         }
 
@@ -37,7 +33,7 @@ class SearchQueryLogger
                 'result_count' => $resultCount,
                 'source' => $source,
                 'store_id' => (int)$this->storeManager->getStore()->getId(),
-                'created_at' => gmdate('Y-m-d H:i:s'),
+                'created_at' => $this->getCurrentUtcTimestamp(),
             ]);
             $this->searchQueryLogResource->save($log);
         } catch (\Throwable $exception) {
@@ -47,5 +43,10 @@ class SearchQueryLogger
                 'exception' => $exception,
             ]);
         }
+    }
+
+    private function getCurrentUtcTimestamp(): string
+    {
+        return (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
     }
 }

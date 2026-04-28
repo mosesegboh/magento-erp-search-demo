@@ -49,7 +49,7 @@ class ProductSyncRetryManager
 
         $delaySeconds = $this->calculateDelaySeconds($attempt);
         $nextAttempt = $attempt + 1;
-        $nextRetryAt = gmdate('Y-m-d H:i:s', time() + $delaySeconds);
+        $nextRetryAt = $this->getNextRetryAt($delaySeconds);
 
         $log->setData('status', SyncLog::STATUS_RETRY_SCHEDULED);
         $log->setData('attempts', $attempt);
@@ -85,7 +85,7 @@ class ProductSyncRetryManager
         }
 
         $queued = 0;
-        $now = gmdate('Y-m-d H:i:s');
+        $now = $this->formatUtcDateTime($this->getCurrentUtcDateTime());
         $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter('status', SyncLog::STATUS_RETRY_SCHEDULED);
         $collection->addFieldToFilter('next_retry_at', ['notnull' => true]);
@@ -171,7 +171,7 @@ class ProductSyncRetryManager
             'queue_topic' => ProductSyncPublisher::TOPIC_NAME,
         ]));
         $log->setData('next_retry_at', null);
-        $log->setData('finished_at', gmdate('Y-m-d H:i:s'));
+        $log->setData('finished_at', $this->formatUtcDateTime($this->getCurrentUtcDateTime()));
         $this->syncLogResource->save($log);
     }
 
@@ -184,6 +184,22 @@ class ProductSyncRetryManager
         }
 
         return (int)min($baseDelay * (2 ** min(max($attempt - 1, 0), 8)), self::MAX_BACKOFF_SECONDS);
+    }
+
+    private function getNextRetryAt(int $delaySeconds): string
+    {
+        $nextRetryDateTime = $this->getCurrentUtcDateTime()->add(new \DateInterval(sprintf('PT%dS', $delaySeconds)));
+        return $this->formatUtcDateTime($nextRetryDateTime);
+    }
+
+    private function getCurrentUtcDateTime(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
+
+    private function formatUtcDateTime(\DateTimeImmutable $dateTime): string
+    {
+        return $dateTime->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     }
 
     /**
