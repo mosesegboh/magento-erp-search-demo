@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: init up down build install shell magento composer logs ps clean-cache reindex cron mock-erp-health mock-erp-products mock-erp-logs search-widget-install search-widget-build
+.PHONY: init up down build install shell magento composer logs ps clean-cache reindex cron mock-erp-health mock-erp-products mock-erp-logs search-widget-install search-widget-build search-widget-build-docker
 
 init:
 	cp -n .env.example .env
@@ -59,3 +59,10 @@ search-widget-install:
 
 search-widget-build:
 	cd src/app/code/Portfolio/SearchEnhancer/frontend && npm run build
+
+search-widget-build-docker:
+	docker run --rm \
+		--user "$$(id -u):$$(id -g)" \
+		-v "$(PWD)":/app \
+		-w /app/src/app/code/Portfolio/SearchEnhancer/frontend \
+		node:22-alpine npm run build

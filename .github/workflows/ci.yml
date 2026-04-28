@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - master
+  push:
+    branches:
+      - develop
+      - master
+      - "feature/**"
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            src/app/code/Portfolio/SearchEnhancer/frontend/package-lock.json
+
+      - name: Validate Magento composer metadata
+        run: composer validate --working-dir=src --no-check-lock --no-check-publish
+
+      - name: Lint custom PHP modules
+        run: bash scripts/ci/lint-php.sh
+
+      - name: Validate Magento XML configuration
+        run: python3 scripts/ci/validate-xml.py
+
+      - name: Check mock ERP API syntax
+        run: bash scripts/ci/check-mock-api.sh
+
+      - name: Build React search widget
+        working-directory: src/app/code/Portfolio/SearchEnhancer/frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Ensure built frontend assets are committed
+        run: |
+          git diff --exit-code -- \
+            src/app/code/Portfolio/SearchEnhancer/view/frontend/web/js/search-autocomplete.bundle.js \
+            src/app/code/Portfolio/SearchEnhancer/view/frontend/web/js/search-autocomplete.bundle.js.map \
+            src/app/code/Portfolio/SearchEnhancer/view/frontend/web/js/search-enhancer-widget.css
+
+      - name: Validate Docker Compose configuration
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
