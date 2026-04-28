@@ -6,6 +6,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="portfolio_erp_sync_products" xsi:type="object">Portfolio\ErpSync\Console\Command\SyncProductsCommand</item>
+                <item name="portfolio_erp_sync_products_enqueue" xsi:type="object">Portfolio\ErpSync\Console\Command\QueueSyncProductsCommand</item>
             </argument>
         </arguments>
     </type>

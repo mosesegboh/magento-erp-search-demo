@@ -5,6 +5,7 @@
         <portfolio_order_export>
             <general>
                 <enabled>1</enabled>
+                <async_enabled>1</async_enabled>
             </general>
             <api>
                 <base_url>http://mock-erp-api:3001</base_url>

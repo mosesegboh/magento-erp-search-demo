@@ -15,6 +15,11 @@
                     <label>Enable Order Export</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="async_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Export New Orders Asynchronously</label>
+                    <comment>When enabled, order placement publishes a RabbitMQ message and the consumer performs the ERP export.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
             </group>
             <group id="api" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>API Connection</label>
