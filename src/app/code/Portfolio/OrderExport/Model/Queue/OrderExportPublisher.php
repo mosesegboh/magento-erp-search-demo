@@ -31,11 +31,7 @@ class OrderExportPublisher
         }
 
         try {
-            $this->publisher->publish(self::TOPIC_NAME, [
-                'orderId' => $orderId,
-                'force' => $force,
-                'logId' => (int)$log->getId(),
-            ]);
+            $this->publishMessage($orderId, $force, (int)$log->getId(), max((int)$log->getData('attempts') + 1, 1));
         } catch (\Throwable $exception) {
             $log->setData('status', ExportLog::STATUS_FAILED);
             $log->setData('message', sprintf('Queue publish failed: %s', $exception->getMessage()));
@@ -51,5 +47,20 @@ class OrderExportPublisher
         }
 
         return (int)$log->getId();
+    }
+
+    public function publishRetry(int $orderId, bool $force, int $logId, int $attempt): void
+    {
+        $this->publishMessage($orderId, $force, $logId, max($attempt, 1));
+    }
+
+    private function publishMessage(int $orderId, bool $force, int $logId, int $attempt): void
+    {
+        $this->publisher->publish(self::TOPIC_NAME, [
+            'orderId' => $orderId,
+            'force' => $force,
+            'logId' => $logId,
+            'attempt' => $attempt,
+        ]);
     }
 }

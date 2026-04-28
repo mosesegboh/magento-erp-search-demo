@@ -13,6 +13,10 @@
                 <timeout>15</timeout>
                 <page_size>25</page_size>
             </api>
+            <retry>
+                <max_attempts>3</max_attempts>
+                <base_delay_seconds>60</base_delay_seconds>
+            </retry>
         </portfolio_erp_sync>
     </default>
 </config>

@@ -122,11 +122,15 @@ Queue integration work through RabbitMQ:
 docker compose exec --user www-data php bin/magento queue:consumers:list | grep portfolio
 docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:enqueue --dry-run
 docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.erp.product_sync --max-messages=1
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:retry-due
 docker compose exec --user www-data php bin/magento portfolio:order-export:enqueue 000000001 --force
 docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.order.export --max-messages=1
+docker compose exec --user www-data php bin/magento portfolio:order-export:retry-due
 ```
 
 See [docs/async-integration-queues.md](docs/async-integration-queues.md).
+
+Retry/backoff and dead-letter handling is documented in [docs/retry-backoff-dlq.md](docs/retry-backoff-dlq.md).
 
 View integration logs in Magento admin:
 
@@ -191,5 +195,5 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Add retry/backoff policies and dead-letter queue documentation.
-2. Add architecture diagrams and final presentation notes.
+1. Add architecture diagrams and final presentation notes.
+2. Add optional AI-assisted catalog enrichment notes.

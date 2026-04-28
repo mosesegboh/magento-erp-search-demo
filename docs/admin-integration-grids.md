@@ -41,6 +41,13 @@ Order export logs:
 docker compose exec --user www-data php bin/magento portfolio:order-export:export 000000001 --force
 ```
 
+Retry/dead-letter logs:
+
+```bash
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:retry-due
+docker compose exec --user www-data php bin/magento portfolio:order-export:retry-due
+```
+
 Search query logs:
 
 ```bash
@@ -52,4 +59,5 @@ curl -fsS "http://localhost:8080/searchenhancer/suggest?q=zzznomatch"
 - Operational logs are visible from Magento admin with ACL-protected menu entries.
 - UI component grids support sorting, filtering, pagination, bookmarks, and column controls.
 - Each grid uses Magento data provider collection mapping instead of custom ad-hoc controllers.
+- Queue retry state is visible through status, attempts, message, and next retry timestamp columns.
 - The implementation keeps read-only observability separate from write/retry workflows.

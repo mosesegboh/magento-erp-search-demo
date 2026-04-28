@@ -37,14 +37,21 @@ class ProductSyncService
      * @return array{items_processed:int, pages_processed:int, dry_run:bool}
      * @throws LocalizedException
      */
-    public function sync(?string $since = null, ?int $pageSize = null, bool $dryRun = false, ?int $logId = null): array
+    public function sync(
+        ?string $since = null,
+        ?int $pageSize = null,
+        bool $dryRun = false,
+        ?int $logId = null,
+        int $attempt = 1
+    ): array
     {
         if (!$this->config->isEnabled()) {
             throw new LocalizedException(__('ERP sync is disabled.'));
         }
 
         $pageSize = $pageSize !== null ? min(max($pageSize, 1), 100) : $this->config->getPageSize();
-        $log = $this->startLog($since, $pageSize, $dryRun, $logId);
+        $attempt = max($attempt, 1);
+        $log = $this->startLog($since, $pageSize, $dryRun, $logId, $attempt);
         $itemsProcessed = 0;
         $pagesProcessed = 0;
 
@@ -115,6 +122,7 @@ class ProductSyncService
         $log->setData([
             'sync_type' => 'product_updates',
             'status' => SyncLog::STATUS_QUEUED,
+            'attempts' => 0,
             'items_processed' => 0,
             'message' => 'Product sync queued for asynchronous processing.',
             'context' => json_encode([
@@ -122,7 +130,9 @@ class ProductSyncService
                 'page_size' => $pageSize,
                 'dry_run' => $dryRun,
                 'queue_topic' => 'portfolio.erp.product_sync',
+                'next_attempt' => 1,
             ], JSON_THROW_ON_ERROR),
+            'next_retry_at' => null,
             'started_at' => gmdate('Y-m-d H:i:s'),
         ]);
         $this->syncLogResource->save($log);
@@ -234,7 +244,7 @@ class ProductSyncService
         );
     }
 
-    private function startLog(?string $since, int $pageSize, bool $dryRun, ?int $logId): SyncLog
+    private function startLog(?string $since, int $pageSize, bool $dryRun, ?int $logId, int $attempt): SyncLog
     {
         $log = $this->syncLogFactory->create();
 
@@ -245,13 +255,16 @@ class ProductSyncService
         $data = [
             'sync_type' => 'product_updates',
             'status' => SyncLog::STATUS_RUNNING,
+            'attempts' => $attempt,
             'items_processed' => 0,
-            'message' => 'Product sync started.',
+            'message' => sprintf('Product sync attempt %d started.', $attempt),
             'context' => json_encode([
                 'since' => $since,
                 'page_size' => $pageSize,
                 'dry_run' => $dryRun,
+                'attempt' => $attempt,
             ], JSON_THROW_ON_ERROR),
+            'next_retry_at' => null,
             'started_at' => gmdate('Y-m-d H:i:s'),
         ];
 
@@ -274,6 +287,7 @@ class ProductSyncService
         $log->setData('items_processed', $itemsProcessed);
         $log->setData('message', $message);
         $log->setData('context', json_encode($context, JSON_THROW_ON_ERROR));
+        $log->setData('next_retry_at', null);
         $log->setData('finished_at', gmdate('Y-m-d H:i:s'));
         $this->syncLogResource->save($log);
     }

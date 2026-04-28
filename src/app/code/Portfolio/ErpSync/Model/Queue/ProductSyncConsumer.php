@@ -15,6 +15,7 @@ class ProductSyncConsumer implements QueueProductSyncInterface
 {
     public function __construct(
         private readonly ProductSyncService $productSyncService,
+        private readonly ProductSyncRetryManager $retryManager,
         private readonly State $appState,
         private readonly LoggerInterface $logger
     ) {
@@ -27,11 +28,18 @@ class ProductSyncConsumer implements QueueProductSyncInterface
      * @param int $pageSize Optional ERP API page-size override.
      * @param bool $dryRun Whether to fetch and log products without writing catalog changes.
      * @param int $logId Existing sync log ID created when the message was published.
+     * @param int $attempt Current queue attempt number.
      * @return void
      */
-    public function execute(string $since = '', int $pageSize = 0, bool $dryRun = false, int $logId = 0): void
+    public function execute(
+        string $since = '',
+        int $pageSize = 0,
+        bool $dryRun = false,
+        int $logId = 0,
+        int $attempt = 1
+    ): void
     {
-        $this->process($since, $pageSize, $dryRun, $logId);
+        $this->process($since, $pageSize, $dryRun, $logId, $attempt);
     }
 
     /**
@@ -41,9 +49,16 @@ class ProductSyncConsumer implements QueueProductSyncInterface
      * @param int $pageSize Optional ERP API page-size override.
      * @param bool $dryRun Whether to fetch and log products without writing catalog changes.
      * @param int $logId Existing sync log ID created when the message was published.
+     * @param int $attempt Current queue attempt number.
      * @return void
      */
-    public function process(string $since = '', int $pageSize = 0, bool $dryRun = false, int $logId = 0): void
+    public function process(
+        string $since = '',
+        int $pageSize = 0,
+        bool $dryRun = false,
+        int $logId = 0,
+        int $attempt = 1
+    ): void
     {
         $this->setAreaCode();
 
@@ -52,18 +67,38 @@ class ProductSyncConsumer implements QueueProductSyncInterface
                 $since !== '' ? $since : null,
                 $pageSize > 0 ? $pageSize : null,
                 $dryRun,
-                $logId > 0 ? $logId : null
+                $logId > 0 ? $logId : null,
+                $attempt
             );
         } catch (\Throwable $exception) {
-            $this->logger->critical('ERP product sync queue consumer failed.', [
+            $scheduled = $this->retryManager->scheduleAfterFailure(
+                $since,
+                $pageSize,
+                $dryRun,
+                $logId,
+                $attempt,
+                $exception
+            );
+
+            $logContext = [
                 'since' => $since,
                 'page_size' => $pageSize,
                 'dry_run' => $dryRun,
                 'log_id' => $logId,
+                'attempt' => $attempt,
+                'retry_scheduled_or_dead_lettered' => $scheduled,
                 'exception' => $exception,
-            ]);
+            ];
 
-            throw $exception;
+            if ($scheduled) {
+                $this->logger->warning('ERP product sync queue consumer failed; retry state updated.', $logContext);
+            } else {
+                $this->logger->critical('ERP product sync queue consumer failed.', $logContext);
+            }
+
+            if (!$scheduled) {
+                throw $exception;
+            }
         }
     }
 
