@@ -9,6 +9,7 @@ use Portfolio\ErpSync\Model\ResourceModel\SyncLog as SyncLogResource;
 
 class SyncLog extends AbstractModel
 {
+    public const STATUS_QUEUED = 'queued';
     public const STATUS_RUNNING = 'running';
     public const STATUS_SUCCESS = 'success';
     public const STATUS_FAILED = 'failed';

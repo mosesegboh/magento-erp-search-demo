@@ -65,6 +65,26 @@ class OrderExportService
         return $log;
     }
 
+    public function queueByOrderId(int $orderId, bool $force = false): ExportLog
+    {
+        if (!$this->config->isEnabled()) {
+            throw new LocalizedException(__('Order export is disabled.'));
+        }
+
+        $order = $this->orderRepository->get($orderId);
+        $log = $this->getOrCreateLog($orderId, (string)$order->getIncrementId());
+
+        if (!$force && $log->getData('status') === ExportLog::STATUS_SUCCESS) {
+            return $log;
+        }
+
+        $log->setData('status', ExportLog::STATUS_QUEUED);
+        $log->setData('message', 'Order export queued for asynchronous processing.');
+        $this->exportLogResource->save($log);
+
+        return $log;
+    }
+
     private function getOrCreateLog(int $orderId, string $incrementId): ExportLog
     {
         $collection = $this->exportLogCollectionFactory->create();

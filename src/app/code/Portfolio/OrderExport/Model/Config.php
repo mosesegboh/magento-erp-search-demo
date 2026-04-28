@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 class Config
 {
     private const XML_PATH_ENABLED = 'portfolio_order_export/general/enabled';
+    private const XML_PATH_ASYNC_ENABLED = 'portfolio_order_export/general/async_enabled';
     private const XML_PATH_API_BASE_URL = 'portfolio_order_export/api/base_url';
     private const XML_PATH_API_TOKEN = 'portfolio_order_export/api/token';
     private const XML_PATH_API_TIMEOUT = 'portfolio_order_export/api/timeout';
@@ -24,6 +25,11 @@ class Config
     public function isEnabled(): bool
     {
         return $this->scopeConfig->isSetFlag(self::XML_PATH_ENABLED, ScopeInterface::SCOPE_STORE);
+    }
+
+    public function isAsyncEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::XML_PATH_ASYNC_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 
     public function getApiBaseUrl(): string

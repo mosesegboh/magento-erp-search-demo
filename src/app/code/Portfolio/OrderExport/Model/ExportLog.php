@@ -9,6 +9,7 @@ use Portfolio\OrderExport\Model\ResourceModel\ExportLog as ExportLogResource;
 
 class ExportLog extends AbstractModel
 {
+    public const STATUS_QUEUED = 'queued';
     public const STATUS_PENDING = 'pending';
     public const STATUS_SUCCESS = 'success';
     public const STATUS_FAILED = 'failed';

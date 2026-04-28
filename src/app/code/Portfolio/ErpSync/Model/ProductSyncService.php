@@ -37,14 +37,14 @@ class ProductSyncService
      * @return array{items_processed:int, pages_processed:int, dry_run:bool}
      * @throws LocalizedException
      */
-    public function sync(?string $since = null, ?int $pageSize = null, bool $dryRun = false): array
+    public function sync(?string $since = null, ?int $pageSize = null, bool $dryRun = false, ?int $logId = null): array
     {
         if (!$this->config->isEnabled()) {
             throw new LocalizedException(__('ERP sync is disabled.'));
         }
 
         $pageSize = $pageSize !== null ? min(max($pageSize, 1), 100) : $this->config->getPageSize();
-        $log = $this->createLog($since, $pageSize, $dryRun);
+        $log = $this->startLog($since, $pageSize, $dryRun, $logId);
         $itemsProcessed = 0;
         $pagesProcessed = 0;
 
@@ -99,6 +99,35 @@ class ProductSyncService
             'pages_processed' => $pagesProcessed,
             'dry_run' => $dryRun,
         ];
+    }
+
+    /**
+     * @throws LocalizedException
+     */
+    public function queueSync(?string $since = null, ?int $pageSize = null, bool $dryRun = false): SyncLog
+    {
+        if (!$this->config->isEnabled()) {
+            throw new LocalizedException(__('ERP sync is disabled.'));
+        }
+
+        $pageSize = $pageSize !== null ? min(max($pageSize, 1), 100) : $this->config->getPageSize();
+        $log = $this->syncLogFactory->create();
+        $log->setData([
+            'sync_type' => 'product_updates',
+            'status' => SyncLog::STATUS_QUEUED,
+            'items_processed' => 0,
+            'message' => 'Product sync queued for asynchronous processing.',
+            'context' => json_encode([
+                'since' => $since,
+                'page_size' => $pageSize,
+                'dry_run' => $dryRun,
+                'queue_topic' => 'portfolio.erp.product_sync',
+            ], JSON_THROW_ON_ERROR),
+            'started_at' => gmdate('Y-m-d H:i:s'),
+        ]);
+        $this->syncLogResource->save($log);
+
+        return $log;
     }
 
     /**
@@ -205,10 +234,15 @@ class ProductSyncService
         );
     }
 
-    private function createLog(?string $since, int $pageSize, bool $dryRun): SyncLog
+    private function startLog(?string $since, int $pageSize, bool $dryRun, ?int $logId): SyncLog
     {
         $log = $this->syncLogFactory->create();
-        $log->setData([
+
+        if ($logId !== null && $logId > 0) {
+            $this->syncLogResource->load($log, $logId);
+        }
+
+        $data = [
             'sync_type' => 'product_updates',
             'status' => SyncLog::STATUS_RUNNING,
             'items_processed' => 0,
@@ -219,7 +253,13 @@ class ProductSyncService
                 'dry_run' => $dryRun,
             ], JSON_THROW_ON_ERROR),
             'started_at' => gmdate('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        if ($log->getId()) {
+            $data['log_id'] = (int)$log->getId();
+        }
+
+        $log->setData($data);
         $this->syncLogResource->save($log);
 
         return $log;

@@ -116,6 +116,18 @@ curl -i "http://localhost:8080/searchenhancer/suggest?q=backpack"
 
 See [docs/search-enhancer-module.md](docs/search-enhancer-module.md).
 
+Queue integration work through RabbitMQ:
+
+```bash
+docker compose exec --user www-data php bin/magento queue:consumers:list | grep portfolio
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:enqueue --dry-run
+docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.erp.product_sync --max-messages=1
+docker compose exec --user www-data php bin/magento portfolio:order-export:enqueue 000000001 --force
+docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.order.export --max-messages=1
+```
+
+See [docs/async-integration-queues.md](docs/async-integration-queues.md).
+
 View integration logs in Magento admin:
 
 ```text
@@ -173,5 +185,5 @@ Do not change `MOCK_ERP_API_URL`; Magento uses the internal Docker service URL.
 
 After Magento is installed:
 
-1. Add RabbitMQ consumers for async ERP product sync and order export.
-2. Add tests, CI, and architecture documentation.
+1. Add tests, CI, and architecture documentation.
+2. Add retry/backoff policies and dead-letter queue documentation.
