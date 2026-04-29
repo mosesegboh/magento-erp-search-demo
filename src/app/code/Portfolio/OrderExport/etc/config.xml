@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <portfolio_order_export>
+            <general>
+                <enabled>1</enabled>
+                <async_enabled>1</async_enabled>
+            </general>
+            <api>
+                <base_url>http://mock-erp-api:3001</base_url>
+                <token>dev-erp-token</token>
+                <timeout>15</timeout>
+            </api>
+            <retry>
+                <max_attempts>3</max_attempts>
+                <base_delay_seconds>60</base_delay_seconds>
+            </retry>
+        </portfolio_order_export>
+    </default>
+</config>

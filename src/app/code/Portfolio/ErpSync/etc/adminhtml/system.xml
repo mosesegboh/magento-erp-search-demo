@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="portfolio" translate="label" sortOrder="300">
+            <label>Portfolio Integrations</label>
+        </tab>
+        <section id="portfolio_erp_sync" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <label>ERP Sync</label>
+            <tab>portfolio</tab>
+            <resource>Portfolio_ErpSync::config</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable ERP Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="cron_enabled" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Scheduled Product Sync</label>
+                    <comment>When enabled, cron imports changed products using the configured API settings.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="api" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>API Connection</label>
+                <field id="base_url" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Base URL</label>
+                    <comment>Use http://mock-erp-api:3001 inside Docker.</comment>
+                    <validate>required-entry validate-url</validate>
+                </field>
+                <field id="token" translate="label comment" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Bearer Token</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Stored encrypted in Magento configuration.</comment>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Timeout Seconds</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="page_size" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Page Size</label>
+                    <validate>required-entry validate-number validate-greater-than-zero</validate>
+                </field>
+            </group>
+            <group id="retry" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Retry Policy</label>
+                <field id="max_attempts" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Max Attempts Before Dead Letter</label>
+                    <comment>Total attempts including the first queue consumer attempt.</comment>
+                    <validate>required-entry validate-number validate-greater-than-zero</validate>
+                </field>
+                <field id="base_delay_seconds" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Base Retry Delay Seconds</label>
+                    <comment>Retries use exponential backoff: base delay, then double on each subsequent failure.</comment>
+                    <validate>required-entry validate-number validate-zero-or-greater</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

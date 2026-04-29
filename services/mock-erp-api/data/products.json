@@ -1,0 +1,186 @@
+[
+  {
+    "sku": "24-MB01",
+    "name": "Voyager Trail Backpack",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "SummitLab",
+    "categories": ["Gear", "Bags"],
+    "price": 74.5,
+    "currency": "USD",
+    "stockQty": 48,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 20},
+      {"warehouse": "DFW", "qty": 28}
+    ],
+    "attributes": {
+      "color": "Graphite",
+      "material": "Recycled nylon",
+      "tags": ["travel", "outdoor", "water-resistant"]
+    },
+    "updatedAt": "2026-04-24T09:15:00Z"
+  },
+  {
+    "sku": "24-WG080",
+    "name": "PulseFit Smart Watch",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "Northbyte",
+    "categories": ["Electronics", "Wearables"],
+    "price": 149.99,
+    "currency": "USD",
+    "stockQty": 32,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 12},
+      {"warehouse": "LAX", "qty": 20}
+    ],
+    "attributes": {
+      "color": "Midnight",
+      "batteryLife": "7 days",
+      "tags": ["fitness", "bluetooth", "health"]
+    },
+    "updatedAt": "2026-04-24T11:40:00Z"
+  },
+  {
+    "sku": "24-UG06",
+    "name": "AeroFlex Running Jacket",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "LumaRun",
+    "categories": ["Apparel", "Jackets"],
+    "price": 89,
+    "currency": "USD",
+    "stockQty": 64,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "DFW", "qty": 40},
+      {"warehouse": "LAX", "qty": 24}
+    ],
+    "attributes": {
+      "color": "Storm Blue",
+      "sizeRange": "XS-XL",
+      "tags": ["running", "lightweight", "breathable"]
+    },
+    "updatedAt": "2026-04-23T16:05:00Z"
+  },
+  {
+    "sku": "24-MG04",
+    "name": "TrailGrip Hiking Boots",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "SummitLab",
+    "categories": ["Footwear", "Outdoor"],
+    "price": 129.95,
+    "currency": "USD",
+    "stockQty": 0,
+    "isInStock": false,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 0},
+      {"warehouse": "DFW", "qty": 0}
+    ],
+    "attributes": {
+      "color": "Walnut",
+      "sizeRange": "7-13",
+      "tags": ["hiking", "waterproof", "boots"]
+    },
+    "updatedAt": "2026-04-24T14:20:00Z"
+  },
+  {
+    "sku": "24-EC01",
+    "name": "BaristaPro Espresso Machine",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "CasaForge",
+    "categories": ["Home", "Kitchen"],
+    "price": 399,
+    "currency": "USD",
+    "stockQty": 15,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "LAX", "qty": 6},
+      {"warehouse": "DFW", "qty": 9}
+    ],
+    "attributes": {
+      "color": "Brushed steel",
+      "pressure": "15 bar",
+      "tags": ["coffee", "espresso", "kitchen"]
+    },
+    "updatedAt": "2026-04-22T10:00:00Z"
+  },
+  {
+    "sku": "24-YM02",
+    "name": "BalancePro Yoga Mat",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "LumaRun",
+    "categories": ["Fitness", "Accessories"],
+    "price": 38.75,
+    "currency": "USD",
+    "stockQty": 120,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 70},
+      {"warehouse": "LAX", "qty": 50}
+    ],
+    "attributes": {
+      "color": "Sage",
+      "thickness": "6mm",
+      "tags": ["yoga", "fitness", "non-slip"]
+    },
+    "updatedAt": "2026-04-21T08:30:00Z"
+  },
+  {
+    "sku": "24-HD88",
+    "name": "QuietSpace Wireless Headphones",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "Northbyte",
+    "categories": ["Electronics", "Audio"],
+    "price": 219.99,
+    "currency": "USD",
+    "stockQty": 27,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 10},
+      {"warehouse": "DFW", "qty": 17}
+    ],
+    "attributes": {
+      "color": "Matte Black",
+      "batteryLife": "30 hours",
+      "tags": ["audio", "noise-cancelling", "bluetooth"]
+    },
+    "updatedAt": "2026-04-24T18:45:00Z"
+  },
+  {
+    "sku": "24-CP10",
+    "name": "HydraPeak Insulated Bottle",
+    "type": "simple",
+    "status": "enabled",
+    "visibility": "catalog_search",
+    "brand": "CasaForge",
+    "categories": ["Gear", "Drinkware"],
+    "price": 29.5,
+    "currency": "USD",
+    "stockQty": 86,
+    "isInStock": true,
+    "warehouseStock": [
+      {"warehouse": "ATL", "qty": 42},
+      {"warehouse": "LAX", "qty": 44}
+    ],
+    "attributes": {
+      "color": "Copper",
+      "capacity": "24oz",
+      "tags": ["hydration", "travel", "insulated"]
+    },
+    "updatedAt": "2026-04-20T13:25:00Z"
+  }
+]

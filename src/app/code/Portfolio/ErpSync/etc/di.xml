@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Portfolio\ErpSync\Api\ErpClientInterface" type="Portfolio\ErpSync\Model\Api\ErpClient"/>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="portfolio_erp_sync_products" xsi:type="object">Portfolio\ErpSync\Console\Command\SyncProductsCommand</item>
+                <item name="portfolio_erp_sync_products_enqueue" xsi:type="object">Portfolio\ErpSync\Console\Command\QueueSyncProductsCommand</item>
+                <item name="portfolio_erp_sync_products_retry_due" xsi:type="object">Portfolio\ErpSync\Console\Command\RetryDueSyncProductsCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="portfolio_erp_sync_log_listing_data_source" xsi:type="string">Portfolio\ErpSync\Model\ResourceModel\SyncLog\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Portfolio\ErpSync\Model\ResourceModel\SyncLog\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">portfolio_erp_sync_log</argument>
+            <argument name="resourceModel" xsi:type="string">Portfolio\ErpSync\Model\ResourceModel\SyncLog</argument>
+        </arguments>
+    </virtualType>
+</config>

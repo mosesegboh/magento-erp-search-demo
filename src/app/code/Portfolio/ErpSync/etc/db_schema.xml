@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="portfolio_erp_sync_log" resource="default" engine="innodb" comment="Portfolio ERP Sync Log">
+        <column xsi:type="int" name="log_id" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="varchar" name="sync_type" nullable="false" length="64" comment="Sync Type"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="32" comment="Status"/>
+        <column xsi:type="int" name="attempts" unsigned="true" nullable="false" default="0" comment="Attempt Count"/>
+        <column xsi:type="int" name="items_processed" unsigned="true" nullable="false" default="0" comment="Items Processed"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="text" name="context" nullable="true" comment="Context JSON"/>
+        <column xsi:type="timestamp" name="next_retry_at" nullable="true" comment="Next Retry At"/>
+        <column xsi:type="timestamp" name="started_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Started At"/>
+        <column xsi:type="timestamp" name="finished_at" nullable="true" comment="Finished At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <index referenceId="PORTFOLIO_ERP_SYNC_LOG_SYNC_TYPE_STATUS" indexType="btree">
+            <column name="sync_type"/>
+            <column name="status"/>
+        </index>
+        <index referenceId="PORTFOLIO_ERP_SYNC_LOG_STARTED_AT" indexType="btree">
+            <column name="started_at"/>
+        </index>
+        <index referenceId="PORTFOLIO_ERP_SYNC_LOG_STATUS_NEXT_RETRY_AT" indexType="btree">
+            <column name="status"/>
+            <column name="next_retry_at"/>
+        </index>
+    </table>
+</schema>
