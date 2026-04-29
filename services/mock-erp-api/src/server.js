@@ -44,11 +44,6 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
-    if (url.pathname === '/openapi.json' && request.method === 'GET') {
-      sendJson(response, 200, buildOpenApiSpec(request));
-      return;
-    }
-
     if (url.pathname === '/docs' && request.method === 'GET') {
       sendHtml(response, buildDocsHtml());
       return;
@@ -368,7 +363,6 @@ function buildDocsHtml() {
   <p>Use <code>Authorization: Bearer ${apiToken}</code> for <code>/api/*</code> endpoints.</p>
   <ul>
     <li><code>GET /health</code></li>
-    <li><code>GET /openapi.json</code></li>
     <li><code>GET /api/products/updates?page=1&amp;pageSize=25&amp;since=2026-04-20T00:00:00Z</code></li>
     <li><code>GET /api/products/24-MB01</code></li>
     <li><code>GET /api/inventory/24-MB01</code></li>
@@ -378,75 +372,4 @@ function buildDocsHtml() {
   <p>Failure simulation: add <code>x-mock-failure: 500</code>, <code>429</code>, or <code>timeout</code>. Add <code>x-mock-delay-ms</code> to simulate latency.</p>
 </body>
 </html>`;
-}
-
-function buildOpenApiSpec(request) {
-  const baseUrl = `http://${request.headers.host}`;
-
-  return {
-    openapi: '3.1.0',
-    info: {
-      title: 'Mock ERP/PIM API',
-      version: '1.0.0',
-      description: 'Local ERP/PIM API used to demonstrate Magento product sync, inventory sync, and order export integrations.'
-    },
-    servers: [{ url: baseUrl }],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer'
-        }
-      }
-    },
-    security: [{ bearerAuth: [] }],
-    paths: {
-      '/health': {
-        get: {
-          security: [],
-          summary: 'Health check',
-          responses: { 200: { description: 'Service health.' } }
-        }
-      },
-      '/api/products/updates': {
-        get: {
-          summary: 'List changed ERP products',
-          parameters: [
-            { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
-            { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 25 } },
-            { name: 'since', in: 'query', schema: { type: 'string', format: 'date-time' } }
-          ],
-          responses: { 200: { description: 'Paginated product changes.' } }
-        }
-      },
-      '/api/products/{sku}': {
-        get: {
-          summary: 'Fetch one product by SKU',
-          parameters: [{ name: 'sku', in: 'path', required: true, schema: { type: 'string' } }],
-          responses: { 200: { description: 'Product record.' }, 404: { description: 'Product not found.' } }
-        }
-      },
-      '/api/inventory/{sku}': {
-        get: {
-          summary: 'Fetch inventory for one SKU',
-          parameters: [{ name: 'sku', in: 'path', required: true, schema: { type: 'string' } }],
-          responses: { 200: { description: 'Inventory record.' }, 404: { description: 'Inventory not found.' } }
-        }
-      },
-      '/api/orders': {
-        post: {
-          summary: 'Export a Magento order to the ERP',
-          parameters: [{ name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string' } }],
-          responses: { 201: { description: 'Order accepted.' }, 200: { description: 'Idempotent replay.' } }
-        }
-      },
-      '/api/orders/{externalId}': {
-        get: {
-          summary: 'Fetch an exported ERP order',
-          parameters: [{ name: 'externalId', in: 'path', required: true, schema: { type: 'string' } }],
-          responses: { 200: { description: 'Exported order.' }, 404: { description: 'Order not found.' } }
-        }
-      }
-    }
-  };
 }
