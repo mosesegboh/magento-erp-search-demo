@@ -75,9 +75,14 @@ Expected result: health returns OK and product updates return JSON data.
 
 ```bash
 docker compose exec --user www-data php bin/magento portfolio:erp:sync-products --dry-run
+docker compose exec --user www-data php bin/magento portfolio:erp:sync-products
+docker compose exec --user www-data php bin/magento indexer:reindex
+docker compose exec --user www-data php bin/magento cache:flush
 docker compose exec --user www-data php bin/magento portfolio:erp:sync-products:enqueue --dry-run
 docker compose exec --user www-data php bin/magento queue:consumers:start portfolio.erp.product_sync --max-messages=1 --area-code=adminhtml
 ```
+
+Expected result: `--dry-run` validates the integration without writing products. The command without `--dry-run` imports products that can be viewed in `Catalog > Products`.
 
 Verify:
 
@@ -90,6 +95,14 @@ Expected result: latest log is `success`.
 ## Order Export
 
 Use a real order increment ID from your store:
+
+On a fresh install, create a test order in admin first:
+
+```text
+Sales > Orders > Create New Order
+```
+
+Then use the created order's increment ID in the export commands.
 
 ```bash
 docker compose exec --user www-data php bin/magento portfolio:order-export:enqueue 000000001 --force

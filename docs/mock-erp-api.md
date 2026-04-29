@@ -1,6 +1,6 @@
 # Mock ERP/PIM API
 
-The mock ERP/PIM API provides a local external system for Magento integration work. It is intentionally simple to run, but it includes real integration concerns: authentication, pagination, idempotency, retryable failures, latency simulation, and an OpenAPI document.
+The mock ERP/PIM API provides a local external system for Magento integration work. It is intentionally simple to run, but it includes real integration concerns: authentication, pagination, idempotency, retryable failures, and latency simulation.
 
 ## URLs
 
@@ -43,7 +43,6 @@ Keep `MOCK_ERP_API_URL=http://mock-erp-api:3001` because Magento uses Docker's i
 ```text
 GET  /health
 GET  /docs
-GET  /openapi.json
 GET  /api/products/updates?page=1&pageSize=25&since=2026-04-20T00:00:00Z
 GET  /api/products/{sku}
 GET  /api/inventory/{sku}

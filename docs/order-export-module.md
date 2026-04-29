@@ -51,6 +51,14 @@ The request includes an `Idempotency-Key` header so retries do not create duplic
 
 ## Manual Export Or Retry
 
+On a fresh install, create a test order in admin first if no orders exist:
+
+```text
+Sales > Orders > Create New Order
+```
+
+Use the created order's increment ID in the CLI commands below.
+
 Export by increment ID:
 
 ```bash
